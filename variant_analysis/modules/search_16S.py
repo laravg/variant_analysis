@@ -24,6 +24,7 @@ Options:
 
 
 """
+import io
 from io import StringIO
 import logging
 import sys
@@ -47,8 +48,8 @@ def train(ref_seqs, kmer_size, ref_db):
     tablesize = nkmers + 10
     kmer_counts = khmer.Countgraph(kmer_size, tablesize, 1)
     seqs_consumed, kmers_consumed = kmer_counts.consume_seqfile(ref_seqs)
-    logging.info('Parsed {} reference sequences which had {} kmers'.format(
-        seqs_consumed, kmers_consumed))
+    # logging.info('Parsed {} reference sequences which had {} kmers'.format(
+    #     seqs_consumed, kmers_consumed))
     kmer_counts.save(ref_db)
 
 
@@ -56,13 +57,12 @@ def find(sample_seqs, ref_db, outfile_handle, max_n_mismatch_in_motif, min_len, 
     kmer_counts = khmer.load_countgraph(ref_db)
     kmer_size = kmer_counts.ksize()
     chance_of_kmer_appearing = kmer_counts.n_unique_kmers()/4.00**kmer_size
-    logging.info("Proportion of reference kmers to all possible kmers: {}".format(
-        chance_of_kmer_appearing))
+    # logging.info("Proportion of reference kmers to all possible kmers: {}".format(
+    #     chance_of_kmer_appearing))
 
     if '>' in sample_seqs:
         sample_seqs = StringIO(sample_seqs)
     seqs_to_assess = skbio.io.read(sample_seqs, format='fasta')
-
     motif = regex.Regex(
         '(?b)(?:{}){{s<={}}}(?:[ACGT]{{{},{}}})(?:{}){{s<={}}}'.format(skbio.DNA(initial_motif).to_regex().pattern,
                                                                        max_n_mismatch_in_motif,
@@ -117,9 +117,9 @@ def find(sample_seqs, ref_db, outfile_handle, max_n_mismatch_in_motif, min_len, 
                     output_gene_16s.append(whole_match.captures()[0])
                     length_seqs.append(len(whole_match.captures()[0]))
 
-            if nseqs_processed % 100 == 0:
-                logging.info(
-                    'Processed {} test sequences'.format(nseqs_processed))
+            # if nseqs_processed % 100 == 0:
+            #     logging.info(
+            #         'Processed {} test sequences'.format(nseqs_processed))
             nseqs_processed += 1
 
         bad_gene = None
