@@ -5,13 +5,13 @@ name = "pypi"
 
 [packages]
 biopython = "*"
-numpy = "*"
 pandas = "*"
 regex = "*"
 bs4 = "*"
 khmer = "*"
 scikit-bio = "*"
 docopt = "*"
+numpy = "*"
 
 [dev-packages]
 pylint = "*"

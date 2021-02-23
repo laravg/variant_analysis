@@ -7,7 +7,7 @@ class Genome:
     header: str
     identifier: str
     taxonomy_identifier: str
-    taxonomy: list[str]
+    taxonomy: dict[str, str]
     sequence: str
     filename: str
     amplified_genes: list[Gene]
@@ -19,8 +19,7 @@ class Genome:
         self.header = header
         self.identifier = identifier
         self.taxonomy_identifier = taxonomy_identifier
-        # TODO: maybe convert to dict using tax_level as key?
-        self.taxonomy = []
+        self.taxonomy = {}
         self.sequence = sequence
         self.filename = filename
         self.amplified_genes = []
@@ -31,8 +30,8 @@ class Genome:
 
 class GenomeBatch:
 
-    taxonomy_identifier: str
-    taxonomy: list[str]
+    taxonomy: str
+    taxonomy_ids: list[str]
     updated_taxonomy: list[str]
     genomes: list[Genome]
     genomes_id_str: str
@@ -40,9 +39,9 @@ class GenomeBatch:
     variants: dict[str, list[Gene]]
     variants_tax_level: dict[str, str]
 
-    def __init__(self, taxonomy_identifier: str, taxonomy: list[str], genomes: list[Genome]):
-        self.taxonomy_identifier = taxonomy_identifier
+    def __init__(self, taxonomy: str, taxonomy_ids: list[list[str]], genomes: list[Genome]):
         self.taxonomy = taxonomy
+        self.taxonomy_ids = taxonomy_ids
         self.updated_taxonomy = []
         self.genomes = genomes
         self.genomes_id_str = '_'.join([x.identifier for x in genomes])

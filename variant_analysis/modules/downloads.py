@@ -41,10 +41,11 @@ def get_info_genomes(genomes: list[Genome]) -> tuple[list[Genome], Optional[str]
     msg = None
     for genome in genomes:
         genome = get_info_genome(genome)
-        if genome.taxonomy[0] == 'Bacteria' or genome.taxonomy[0] == 'Archaea':
+        if genome.taxonomy['superkingdom'] == 'Bacteria' or genome.taxonomy['superkingdom'] == 'Archaea':
             valid_genomes.append(genome)
         else:
-            rejected_ids.append(f'{genome.identifier}({genome.taxonomy[0]})')
+            rejected_ids.append(
+                f'{genome.identifier}({genome.taxonomy["superkingdom"]})')
     if rejected_ids:
         msg = f'Genomes {", ".join(rejected_ids)} ignored'
     return (valid_genomes, msg)
@@ -72,7 +73,7 @@ def get_info_genome(genome: Genome) -> Genome:
         db="taxonomy", id=genome.taxonomy_identifier, retmode='xml')
     genome_taxonomy_xml = handle.read()
     handle.close()
-    taxonomy_list = []
+
     root = ET.fromstring(genome_taxonomy_xml)
     global_taxon = root.find('Taxon')
     strain = global_taxon.find('ScientificName').text
@@ -81,8 +82,7 @@ def get_info_genome(genome: Genome) -> Genome:
         rank = taxon.find('Rank').text
         scientificName = taxon.find('ScientificName').text
         if rank in basic_categories:
-            taxonomy_list.append(scientificName)
-    taxonomy_list.append(strain)
-    genome.taxonomy = taxonomy_list
+            genome.taxonomy[rank] = scientificName
+    genome.taxonomy['species'] = strain
 
     return genome

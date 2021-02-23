@@ -17,9 +17,10 @@ def create_parser():
                         help='path to the directory where the results will be stored')
     parser.add_argument('-f', '--format', metavar='format', nargs='+', required=True, choices=['mothur', 'qiime', 'dada2'],
                         help='output formats: mothur, qiime, dada2 (separated by spaces)')
-    parser.add_argument('-t', '--training-database', metavar='training_database', choices=['HOMD', 'GREENGENES', 'ARCHAEA'], default='HOMD',
+    parser.add_argument('-td', '--training-database', metavar='training_database', choices=['HOMD', 'GREENGENES', 'ARCHAEA'], default='HOMD',
                         help='HOMD for Human Oral Microbiome Database 16S rRNA (default), GREENGENES for Greengenes 16S rRNA gene database')
-
+    parser.add_argument('-tl', '--taxonomy-level', metavar='taxonomy_level', choices=["superkingdom", "phylum", "class", "order", "family", "genus", "species"],
+                        default='species', help='Taxonomy level')  # TODO: change help
     return parser
 
 

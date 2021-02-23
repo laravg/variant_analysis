@@ -21,6 +21,7 @@ def main():
     output_path = args.output
     output_formats = args.format
     training_db = args.training_database
+    taxonomy_level = args.taxonomy_level
 
     logging.info('Starting analysis')
 
@@ -61,7 +62,7 @@ def main():
     genomes, msg = downloads.get_info_genomes(genomes)
     if msg:
         logging.warning(msg)
-    genome_batches = logic.group_genomes_by_taxonomy(genomes)
+    genome_batches = logic.group_genomes_by_taxonomy(genomes, taxonomy_level)
 
     logging.info('Analyzing genomes grouped by taxonomy')
     for batch in genome_batches:
@@ -77,6 +78,7 @@ def main():
             f'{batch.genomes_id_str} - Generating output files')
         output_manager.save_variants(batch, output_formats, output_path)
 
+        # TODO: generate the info for different taxonomic levels
         logging.info(
             f'{batch.genomes_id_str} - Generating file with variants relevant information')
         output_manager.save_variants_information(batch, output_path)
