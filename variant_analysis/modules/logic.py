@@ -4,18 +4,21 @@ import hashlib
 from classes.Genome import Genome, GenomeBatch
 from classes.Gene import Gene
 
-taxonomy_levels_order: dict[str, int] = {
-    "superkingdom": 0, "phylum": 1, "class": 2, "order": 3, "family": 4, "genus": 5, "species": 6}
+taxonomy_levels: list[str] = ["superkingdom", "phylum",
+                              "class", "order", "family", "genus", "species"]
 
 
 def group_genomes_by_taxonomy(genomes: list[Genome], taxonomy_level: str) -> list[GenomeBatch]:
 
     genomes_grouped = {}
     taxonomy_ids_in_group = {}
+    taxonomy_dict = {}
     for genome in genomes:
-        position = taxonomy_levels_order[taxonomy_level] + 1
+        position = taxonomy_levels.index(taxonomy_level) + 1
         taxonomy_to_group = ';'.join(
             list(genome.taxonomy.values())[:position])
+        taxonomy_dict[taxonomy_to_group] = {
+            key: genome.taxonomy[key] for key in taxonomy_levels[:position]}
         if taxonomy_to_group not in genomes_grouped:
             genomes_grouped[taxonomy_to_group] = []
         genomes_grouped[taxonomy_to_group].append(genome)
@@ -23,6 +26,7 @@ def group_genomes_by_taxonomy(genomes: list[Genome], taxonomy_level: str) -> lis
             taxonomy_ids_in_group[taxonomy_to_group] = []
         taxonomy_ids_in_group[taxonomy_to_group].append(
             genome.taxonomy_identifier)
+
         # if genome.taxonomy_identifier not in genomes_grouped:
         #     genomes_grouped[genome.taxonomy_identifier] = []
         # genomes_grouped[genome.taxonomy_identifier].append(genome)
@@ -31,7 +35,7 @@ def group_genomes_by_taxonomy(genomes: list[Genome], taxonomy_level: str) -> lis
     genome_batches = []
     for taxonomy_to_group in genomes_grouped:
         batch = GenomeBatch(
-            taxonomy_to_group, taxonomy_ids_in_group[taxonomy_to_group], genomes_grouped[taxonomy_to_group])
+            taxonomy_to_group, taxonomy_dict[taxonomy_to_group], taxonomy_ids_in_group[taxonomy_to_group], genomes_grouped[taxonomy_to_group])
         genome_batches.append(batch)
 
     return genome_batches
@@ -75,7 +79,7 @@ def find_variants(genome_batch: GenomeBatch) -> GenomeBatch:
 
     for gene in genome_batch.analyzed_genes:
         gene.variant_tax_level = genome_batch.variants_tax_level[gene.sequence]
-        taxonomy_copy = genome_batch.taxonomy.copy()
+        taxonomy_copy = genome_batch.taxonomy_dict.copy()
         taxonomy_copy['variant'] = gene.variant_tax_level
         gene.updated_taxonomy = taxonomy_copy
         gene.variant_id = str(int(hashlib.sha256(

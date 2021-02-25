@@ -31,16 +31,18 @@ class Genome:
 class GenomeBatch:
 
     taxonomy: str
+    taxonomy_dict: dict[str, str]
     taxonomy_ids: list[str]
-    updated_taxonomy: list[str]
+    updated_taxonomy: dict[str, str]
     genomes: list[Genome]
     genomes_id_str: str
     analyzed_genes: list[Gene]
     variants: dict[str, list[Gene]]
     variants_tax_level: dict[str, str]
 
-    def __init__(self, taxonomy: str, taxonomy_ids: list[list[str]], genomes: list[Genome]):
+    def __init__(self, taxonomy: str, taxonomy_dict: dict[str, str], taxonomy_ids: list[list[str]], genomes: list[Genome]):
         self.taxonomy = taxonomy
+        self.taxonomy_dict = taxonomy_dict
         self.taxonomy_ids = taxonomy_ids
         self.updated_taxonomy = []
         self.genomes = genomes

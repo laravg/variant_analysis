@@ -21,7 +21,7 @@ def save_variants(genome_batch: GenomeBatch, output_formats: list[str], output_d
                 lines = ''
                 for variant_seq in genome_batch.variants:
                     variant = genome_batch.variants[variant_seq][0]
-                    lines += f'>{variant.variant_id}\t{";".join(variant.updated_taxonomy.values())}\n{variant.sequence}\n'
+                    lines += f'>{variant.variant_id}\t{";".join(list(variant.updated_taxonomy.values()))}\n{variant.sequence}\n'
                 taxonomy_file.write(lines)
 
         else:
@@ -31,13 +31,12 @@ def save_variants(genome_batch: GenomeBatch, output_formats: list[str], output_d
                 for variant_seq in genome_batch.variants:
                     variant = genome_batch.variants[variant_seq][0]
                     if format == 'qiime':
-                        taxonomy = variant.updated_taxonomy.values().copy()[
-                            :-1]
-                        taxonomy[-1] = f'{taxonomy[-1]} {variant.variant_tax_level}'
-                        taxonomy = [f'{category}{taxonomy[num]}' for num, category in enumerate(
+                        taxonomy = variant.updated_taxonomy.copy().remove('variant')
+                        taxonomy['species'] = f'{taxonomy["species"]} {variant.variant_tax_level}'
+                        taxonomy = [f'{category}{list(taxonomy.values())[num]}' for num, category in enumerate(
                             qiime_categories)]
                     else:
-                        taxonomy = variant.updated_taxonomy.values()
+                        taxonomy = list(variant.updated_taxonomy.values())
                     lines += f'>{variant.variant_id}\t{";".join(taxonomy)}\n'
                 taxonomy_file.write(lines)
 
@@ -46,7 +45,7 @@ def save_variants(genome_batch: GenomeBatch, output_formats: list[str], output_d
                 lines = ''
                 for variant_seq in genome_batch.variants:
                     variant = genome_batch.variants[variant_seq][0]
-                    lines += f'>{variant.variant_id}|{variant.updated_taxonomy.values()[-2]}|{variant.updated_taxonomy.values()[-1]}\n{variant.sequence}'
+                    lines += f'>{variant.variant_id}|{list(variant.updated_taxonomy.values())[-2]}|{list(variant.updated_taxonomy.values())[-1]}\n{variant.sequence}'
                 fasta_file.write(lines)
 
 
@@ -68,14 +67,14 @@ def save_variants_information(genome_batch: GenomeBatch, output_dir_path: str):
             line.append(genome_batch.get_main_genome().database_name)
             line.append(str(genome_batch.get_num_analyzed_genes()))
             line.append(str(genome_batch.get_num_variants()))
-            line.extend(variant.updated_taxonomy.values())
+            line.extend(list(variant.updated_taxonomy.values()))
             # line = line + tax_variant[:-1]
             # if len(tax_variant[:-1]) < 7:
             #     dash_to_insert = 7 - len(tax_variant[:-1])
             #     line = line + ['_']*dash_to_insert
             # line.append(tax_variant[-1])
             line.append(str(
-                genome_batch.taxonomy['superkingdom'] == 'Bacteria' or genome_batch.taxonomy['superkingdom'] == 'Archaea'))
+                genome_batch.taxonomy_dict['superkingdom'] == 'Bacteria' or genome_batch.taxonomy_dict['superkingdom'] == 'Archaea'))
             statistics_file.write(f'{";".join(line)}\n')
 
 
@@ -107,9 +106,9 @@ def save_genes_information(genome_batch: GenomeBatch, output_dir_path: str):
                 # if len(genome.taxonomy) < 7:
                 #     dash_to_insert = 7 - len(genome.taxonomy)
                 #     line = line + ['_']*dash_to_insert
-                line.extend(gene.updated_taxonomy.values())
+                line.extend(list(gene.updated_taxonomy.values()))
                 line.append(str(
-                    genome_batch.taxonomy[0] == 'Bacteria' or genome_batch.taxonomy[0] == 'Archaea'))
+                    genome_batch.taxonomy_dict['superkingdom'] == 'Bacteria' or genome_batch.taxonomy_dict['superkingdom'] == 'Archaea'))
                 statistics_file.write(f'{";".join(line)}\n')
 
         else:
@@ -124,8 +123,8 @@ def save_genes_information(genome_batch: GenomeBatch, output_dir_path: str):
             line.append('_')
             line.append('_')
             line.append('_')
-            line.extend(genome_batch.taxonomy.values())
+            line.extend(list(genome_batch.taxonomy.values()))
             line.append('_')
             line.append(str(
-                genome_batch.taxonomy['superkingdom'] == 'Bacteria' or genome_batch.taxonomy['superkingdom'] == 'Archaea'))
+                genome_batch.taxonomy_dict['superkingdom'] == 'Bacteria' or genome_batch.taxonomy_dict['superkingdom'] == 'Archaea'))
             statistics_file.write(f'{";".join(line)}\n')
