@@ -12,6 +12,8 @@ bs4 = "*"
 khmer = "*"
 scikit-bio = "*"
 docopt = "*"
+openpyxl = "*"
+xlsxwriter = "*"
 
 [dev-packages]
 pylint = "*"

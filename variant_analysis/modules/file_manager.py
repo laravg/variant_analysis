@@ -3,7 +3,9 @@ from typing import Optional
 from Bio import SeqIO
 import os
 from classes.Genome import Genome
-# import csv
+from classes.PrimerPair import PrimerPair
+import csv
+import pandas as pd
 
 
 def create_dir(path: str):
@@ -30,7 +32,7 @@ def read_input_dir(path: str) -> tuple[list[Genome], Optional[str]]:
 
     unique_genome_ids = list(set(genome_ids))
     if len(unique_genome_ids) != len(genome_ids):
-        msg = f'Ignored {len(genome_ids)-len(unique_genome_ids)} repeated genomes'
+        msg = f'Ignored repeated genome ids: {[identifier for identifier in genome_ids if identifier not in unique_genome_ids]}'
 
     if not genomes:
         raise Exception('No genomes found in directory')
@@ -46,8 +48,10 @@ def read_input_file(path: str) -> tuple[list[str], Optional[str]]:
         genome_ids = [id.strip()
                       for line in lines if line for id in line.split(',')]
         unique_genome_ids = list(set(genome_ids))
-        if len(unique_genome_ids) != len(genome_ids):
-            msg = f'Ignored {len(genome_ids)-len(unique_genome_ids)} repeated genomes'
+        duplicate_genome_ids = list(set(
+            [x for x in genome_ids if genome_ids.count(x) > 1]))
+        if duplicate_genome_ids:
+            msg = f'Ignored repeated genome ids: {duplicate_genome_ids}'
         # elif '.csv' == path.suffix:
         #     sniffer = csv.Sniffer()
         #     first_lines = file.read(1024)
@@ -64,3 +68,17 @@ def read_input_file(path: str) -> tuple[list[str], Optional[str]]:
     if not unique_genome_ids:
         raise Exception('No genomes found in file')
     return (unique_genome_ids, msg)
+
+
+def read_csv_file(path: str) -> tuple[list[PrimerPair], Optional[str]]:
+    msg = None
+    primers: list[PrimerPair] = []
+    with open(path, 'r') as file:
+        sniffer = csv.Sniffer()
+        dialect = sniffer.sniff(file.readline())
+        file.seek(0)
+        primers_df = pd.read_csv(file, delimiter=dialect.delimiter)
+        primers = [PrimerPair(row['Primer pair'], row['F Sequence'],
+                              row['R sequence']) for index, row in primers_df.iterrows()]
+
+    return (primers, msg)
