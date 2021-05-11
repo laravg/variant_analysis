@@ -27,7 +27,7 @@ args = execute_parser()
 path = args.directory
 
 categories = ["superkingdom_all.xlsx", "phylum_all.xlsx", "class_all.xlsx", "order_all.xlsx",
-              "family_all.xlsx", "genus_all.xlsx", "species_all.xlsx", "strain_all.xlsx"]
+              "family_all.xlsx", "genus_all.xlsx", "species_all.xlsx", "strain_all_separated.xlsx"]
 # "species_all_fix_genus_species.xlsx"
 
 
@@ -41,18 +41,19 @@ for file in categories:
     df = pd.read_excel(file_path)
     #df.rename(columns={'Num_unique_genes': 'Num_variant_genes'}, inplace=True)
 
-    # if file == 'species_all_fix_genus_species.xlsx':
-    #     sheet_name = file.replace('_all_fix_genus_species.xlsx', '').title()
-    #     columns = ["Superkingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species&strain", "Genomes_mean_size", "Genes_mean_size",
-    #                "Num_genes", "Num_variant_genes", "Num_genes_+strand", "Num_genes_-strand", "Genomes", "Main_genome_description", "Taxonomy_Id"]
-    # else:
-    #     sheet_name = file.replace('_all.xlsx', '').title()
-    #     columns = list(df.columns)
-    #     columns[-1], columns[-2] = columns[-2], columns[-1]
+    if file == 'strain_all_separated.xlsx':
+        #sheet_name = file.replace('_all_fix_genus_species.xlsx', '').title()
+        sheet_name = file.replace('_all_separated.xlsx', '').title()
+        columns = ["Superkingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species", "Strain", "Genomes_mean_size", "Genes_mean_size",
+                   "Num_genes", "Num_variant_genes", "Num_genes_+strand", "Num_genes_-strand", "Genomes", "Main_genome_description", "Taxonomy_Id"]
+    else:
+        sheet_name = file.replace('_all.xlsx', '').title()
+        columns = list(df.columns)
+        columns[-1], columns[-2] = columns[-2], columns[-1]
 
-    sheet_name = file.replace('_all.xlsx', '').title()
-    columns = list(df.columns)
-    columns[-1], columns[-2] = columns[-2], columns[-1]
+    # sheet_name = file.replace('_all.xlsx', '').title()
+    # columns = list(df.columns)
+    # columns[-1], columns[-2] = columns[-2], columns[-1]
 
     new_df = df[columns]
     new_df.to_excel(writer, sheet_name=sheet_name,

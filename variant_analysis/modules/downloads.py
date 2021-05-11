@@ -84,6 +84,8 @@ def get_info_genome(genome: Genome) -> Genome:
         genome_taxonomy_xml = handle.read()
         handle.close()
 
+        print(genome.identifier + ' - ' + genome.taxonomy_identifier)
+
         root = ET.fromstring(genome_taxonomy_xml)
         global_taxon = root.find('Taxon')
         strain = global_taxon.find('ScientificName').text

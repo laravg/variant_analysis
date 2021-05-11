@@ -79,28 +79,40 @@ class RepeatedVariant:
             species = ''
             strain = ''
 
-            if 'str.' in speciesNstrain:
-                pos = speciesNstrain.find('str.')
-                species = speciesNstrain[:pos]
-                strain = speciesNstrain[pos:]
-            elif 'subsp.' in speciesNstrain:
-                speciesNstrain_split = speciesNstrain.split(' ')
-                index = speciesNstrain_split.index('subsp.')
-                pos = index + 2
-                species_list = speciesNstrain_split[:pos]
-                species = ' '.join(species_list)
-                strain_list = speciesNstrain_split[pos:]
-                strain = ' '.join(strain_list)
+            # if 'subsp.' in speciesNstrain:
+            #     pos = speciesNstrain.find('subsp.')
+            #     species = speciesNstrain[:pos]
+            #     strain = speciesNstrain[pos:]
+            # elif 'str.' in speciesNstrain:
+            #     pos = speciesNstrain.find('str.')
+            #     species = speciesNstrain[:pos]
+            #     strain = speciesNstrain[pos:]
+            # speciesNstrain_split = speciesNstrain.split(' ')
+            # index = speciesNstrain_split.index('subsp.')
+            # pos = index + 2
+            # species_list = speciesNstrain_split[:pos]
+            # species = ' '.join(species_list)
+            # strain_list = speciesNstrain_split[pos:]
+            # strain = ' '.join(strain_list)
+            if 'sp.' in speciesNstrain and not 'subsp.' in speciesNstrain:
+                if 'str.' in speciesNstrain:
+                    pos = speciesNstrain.find('str.')
+                    species = speciesNstrain[:pos]
+                    strain = speciesNstrain[pos:]
+                else:
+                    species = speciesNstrain
+                species = ' '.join(species.split(' ')[1:])
+
             else:
                 speciesNstrain_split = speciesNstrain.split(' ')
                 species_list = speciesNstrain_split[:2]
                 species = ' '.join(species_list)
                 strain_list = speciesNstrain_split[2:]
                 strain = ' '.join(strain_list)
+                species = ' '.join(species.split(' ')[1:])
 
-            strain.strip()
-            species.strip()
-            new_taxonomy = taxonomy_splitted + [species] + [strain]
+            new_taxonomy = taxonomy_splitted[:-1] + \
+                [species.strip()] + [strain.strip()]
 
             lines.append(
                 f'{self.identifier};{ids};{";".join(new_taxonomy)}')
@@ -128,7 +140,7 @@ for header, seq in all_data_grouped:
 fasta_lines = [repeated_variant.get_fasta_contents()
                for repeated_variant in repeated_variants]
 csv_header = ['Repeated_variant_id', 'Genome_ids', "Superkingdom", "Phylum", "Class", "Order",
-              "Family", "Genus", "Species&strain", "Species", "Strain"]
+              "Family", "Genus", "Species", "Strain"]
 csv_contents = [repeated_variant.get_xlsx_contents()
                 for repeated_variant in repeated_variants]
 csv_lines = [';'.join(csv_header)] + \
